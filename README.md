@@ -19,9 +19,8 @@ A template is simply a text file and can be in any number of formats. This task 
 |BUILD_REPOSITORY_URI| - The URI to the repository where the code exists for the build, from the build environment variable of the same name.</br>
 |BUILD_BUILDURI| - the URI for this build, from the build environment variable of the same name.</br>
 |CURRENT_DATE_UTC| - The date and time this task was run in UTC.</br>
-
-|BUILD_QUERY_ONE| - The first defined query results.
-|BUILD_QUERY_TWO| - The second defined query results.
+|BUILD_QUERY_ONE| - The first defined query results.</br>
+|BUILD_QUERY_TWO| - The second defined query results.</br>
 |BUILD_QUERY_THREE| - The third defined query results.
 
 Samples of build templates can be found in the templates directory.
