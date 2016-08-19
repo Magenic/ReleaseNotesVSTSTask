@@ -1,8 +1,8 @@
 # ReleaseNotesVSTSTask
 Task for VSTS to create release notes base on VSTS queries.
 
-# Why Use this extension?
-This extension is great for continuous deployment processes when you want to automatically generate release notes from VSTS. It is written on Node.Js to give flexibility on what type of build server it can run on. There is no particular logic cycle in VSTS that this task ties to so you can use this to create release notes regardless of the type of build server.
+# Why Use this task?
+This task is great for continuous deployment processes when you want to automatically generate release notes from VSTS. It is written on Node.Js to give flexibility on what type of build server it can run on. There is no particular logic cycle in VSTS that this task ties to so you can use this to create release notes regardless of the type of build server.
 
 # How does it work?
 This task is designed to not be tied to any particular VSTS item statuses or logic cycles. Instead it can insert several different build variables and up to three query results into a template you create. The queries can point to any shared queries in your repository with the caveat that the queries must be accessible to the Project Collection Build Service. It will then add a list to the template, replacing the given token with the id, title and type of each VSTS item that is returned by the query.
@@ -12,13 +12,13 @@ For each of the three queries you can include it can also, if you specify it to 
 # How do I create a template?
 A template is simply a text file and can be in any number of formats. This task will read in the text and do simple token replacement. You may use some or any of the following tokens which will be replaced with the given values:
 
-|BUILD_BUILDID| - the build id from the build environment variable of the same name.
-|BUILD_BUILDNUMBER| - the build number from the build environment variable of the same name.
-|BUILD_SOURCEVERSION| - the source version from the build environment variable of the same name.
-|BUILD_SOURCEBRANCHNAME| - the branch name from the build environment variable of the same name.
-|BUILD_REPOSITORY_URI| - The URI to the repository where the code exists for the build, from the build environment variable of the same name.
-|BUILD_BUILDURI| - the URI for this build, from the build environment variable of the same name.
-|CURRENT_DATE_UTC| - The date and time this task was run in UTC.
+|BUILD_BUILDID| - the build id from the build environment variable of the same name.</br>
+|BUILD_BUILDNUMBER| - the build number from the build environment variable of the same name.</br>
+|BUILD_SOURCEVERSION| - the source version from the build environment variable of the same name.</br>
+|BUILD_SOURCEBRANCHNAME| - the branch name from the build environment variable of the same name.</br>
+|BUILD_REPOSITORY_URI| - The URI to the repository where the code exists for the build, from the build environment variable of the same name.</br>
+|BUILD_BUILDURI| - the URI for this build, from the build environment variable of the same name.</br>
+|CURRENT_DATE_UTC| - The date and time this task was run in UTC.</br>
 
 |BUILD_QUERY_ONE| - The first defined query results.
 |BUILD_QUERY_TWO| - The second defined query results.
