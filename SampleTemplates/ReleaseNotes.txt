@@ -1,0 +1,11 @@
+#Release Notes
+</br>
+## Build Number: |BUILD_BUILDID|
+</br>
+## Build Date: |CURRENT_DATE_UTC|
+</br>
+### Work items associated with this release
+|BUILD_QUERY_ONE|
+</br>
+### Bug Fixes associated with this release
+|BUILD_QUERY_TWO|

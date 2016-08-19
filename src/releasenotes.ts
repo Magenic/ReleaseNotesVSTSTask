@@ -7,9 +7,7 @@ import vsts = require('vso-node-api');
 import fc = require('vso-node-api/FileContainerApi');
 import fs = require('fs');
 import VSSInterfaces = require("vso-node-api/interfaces/common/VSSInterfaces");
-//import httpClient = require('vso-node-api/HttpClient');
 import WorkItemTrackingInterfaces = require("vso-node-api/interfaces/WorkItemTrackingInterfaces");
-//import TfsCoreInterfaces = require("vso-node-api/interfaces/CoreInterfaces");
 
 async function run() {
     try {
@@ -47,11 +45,8 @@ async function run() {
         var data = fs.readFileSync(templateFileName);
         var templateText = data.toString();
 
-        templateText = ReplaceBuildId(templateText, buildId);
+        templateText = ReplaceBuildTokens(templateText, buildId);
 
-        templateText = ReplaceUTCDate(templateText);
-
-        
         ParseQueryResults(firstQueryId, projectId, vstsWit, "|BUILD_QUERY_ONE|", templateText, buildId, updateFirstQuery).then((value: string) => {
             templateText = value;
 
@@ -80,14 +75,55 @@ async function run() {
     }
 }
 
+function ReplaceBuildTokens(templateText : string, buildId : string) : string {
+    templateText = ReplaceBuildId(templateText, buildId);
+    templateText = ReplaceBuildNumber(templateText);
+    templateText = ReplaceSourceVersion(templateText);
+    templateText = ReplaceSourceBranchName(templateText);
+    templateText = ReplaceRepositoryUri(templateText);
+    templateText = ReplaceBuildUri(templateText);
+    templateText = ReplaceUTCDate(templateText);
+    return templateText;
+}
+
 function ReplaceBuildId(templateText : string, buildId : string) : string {
-    templateText = templateText.replace("|BUILD_NUMBER|", buildId);
+    templateText = templateText.replace("|BUILD_BUILDID|", buildId);
+    return templateText;
+}
+
+function ReplaceBuildNumber(templateText : string) : string {
+    var buildVariable = process.env.BUILD_BUILDNUMBER;
+    templateText = templateText.replace("|BUILD_BUILDNUMBER|", buildVariable);
+    return templateText;
+}
+
+function ReplaceSourceVersion(templateText : string) : string {
+    var buildVariable = process.env.BUILD_SOURCEVERSION;
+    templateText = templateText.replace("|BUILD_SOURCEVERSION|", buildVariable);
+    return templateText;
+}
+
+function ReplaceSourceBranchName(templateText : string) : string {
+    var buildVariable = process.env.BUILD_SOURCEBRANCHNAME;
+    templateText = templateText.replace("|BUILD_SOURCEBRANCHNAME|", buildVariable);
+    return templateText;
+}
+
+function ReplaceRepositoryUri(templateText : string) : string {
+    var buildVariable = process.env.BUILD_REPOSITORY_URI;
+    templateText = templateText.replace("|BUILD_REPOSITORY_URI|", buildVariable);
+    return templateText;
+}
+
+function ReplaceBuildUri(templateText : string) : string {
+    var buildVariable = process.env.BUILD_BUILDURI;
+    templateText = templateText.replace("|BUILD_BUILDURI|", buildVariable);
     return templateText;
 }
 
 function ReplaceUTCDate(templateText : string) : string {
-    var currentDate = (new Date()).toUTCString();;
-    templateText = templateText.replace("|BUILD_DATE_UTC|", currentDate);
+    var buildVariable = (new Date()).toUTCString();;
+    templateText = templateText.replace("|CURRENT_DATE_UTC|", buildVariable);
     return templateText;
 }
 
