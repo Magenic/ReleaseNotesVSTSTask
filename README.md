@@ -30,7 +30,7 @@ Samples of build templates can be found in the templates directory.
 
 As part of the build add this task which should look like this:
 
-![alt tag](/docs/to/TaskSetup.png?raw=true "Setup")
+![alt tag](/docs/TaskSetup.png?raw=true "Setup")
 
 ## Output file
 The is the path and file name in the build to output the release notes file. You can then use this location to do something with the release notes, like add them to a HockeyApp upload. Here is an example:
@@ -52,19 +52,19 @@ The following shows the settings for setting up security on the query:
 
 Go to the query and select the security option:
 
-![alt tag](/docs/to/EnterSecurity.png?raw=true "Security")
+![alt tag](/docs/EnterSecurity.png?raw=true "Security")
 
 Add a user to the security configuration:
 
-![alt tag](/docs/to/AddUser.png?raw=true "Add User")
+![alt tag](/docs/AddUser.png?raw=true "Add User")
 
 Select to add the Project Collection Build Services user:
 
-![alt tag](/docs/to/SelectUser.png?raw=true "Select User")
+![alt tag](/docs/SelectUser.png?raw=true "Select User")
 
 Make sure read is set to allow for the Project Collection Build Services and the Save Changes button is pressed:
 
-![alt tag](/docs/to/UserSettings.png?raw=true "User Security Settings")
+![alt tag](/docs/UserSettings.png?raw=true "User Security Settings")
 
 ### Find out the guid of the query
 You can find the quid of the query by opening a browser that is logged on to your VSTS account and navigate to a URL in the following format:
