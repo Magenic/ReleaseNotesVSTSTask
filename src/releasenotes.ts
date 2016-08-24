@@ -6,12 +6,11 @@ import * as wit from 'vso-node-api/WorkItemTrackingApi';
 import vsts = require('vso-node-api');
 import fc = require('vso-node-api/FileContainerApi');
 import fs = require('fs');
-import VSSInterfaces = require("vso-node-api/interfaces/common/VSSInterfaces");
-import WorkItemTrackingInterfaces = require("vso-node-api/interfaces/WorkItemTrackingInterfaces");
+import VSSInterfaces = require('vso-node-api/interfaces/common/VSSInterfaces');
+import WorkItemTrackingInterfaces = require('vso-node-api/interfaces/WorkItemTrackingInterfaces');
 
 async function run() {
     try {
-
 
         var uri = process.env.SYSTEM_TEAMFOUNDATIONCOLLECTIONURI;
         console.log('Uri: ' + uri);
@@ -19,24 +18,24 @@ async function run() {
         console.log('ProjectId: ' + projectId);
         var buildId = process.env.BUILD_BUILDID;
 
-        var vssEndPoint = tl.getEndpointAuthorization("SystemVssConnection", true);
+        var vssEndPoint = tl.getEndpointAuthorization('SystemVssConnection', true);
         var token = vssEndPoint.parameters['AccessToken'];
 
         let authHandler = vsts.getPersonalAccessTokenHandler(token); 
         
         var connection = new vsts.WebApi(uri, authHandler); 
 
-        console.log("connection established");
+        console.log('connection established');
 
         let vstsWit: wit.IWorkItemTrackingApi = connection.getWorkItemTrackingApi();
-        console.log("work item interface created.");
+        console.log('work item interface created.');
 
         var firstQueryId : string = tl.getInput('firstQueryId', false);
-        var updateFirstQuery : boolean = tl.getBoolInput("addBuildNumberToBugsTasksFirstQuery", false);
+        var updateFirstQuery : boolean = tl.getBoolInput('addBuildNumberToBugsTasksFirstQuery', false);
         var secondQueryId : string = tl.getInput('secondQueryId', false);
-        var updateSecondQuery : boolean = tl.getBoolInput("addBuildNumberToBugsTasksSecondQuery", false);
+        var updateSecondQuery : boolean = tl.getBoolInput('addBuildNumberToBugsTasksSecondQuery', false);
         var thirdQueryId : string = tl.getInput('thirdQueryId', false);
-        var updateThirdQuery : boolean = tl.getBoolInput("addBuildNumberToBugsTasksThirdQuery", false);
+        var updateThirdQuery : boolean = tl.getBoolInput('addBuildNumberToBugsTasksThirdQuery', false);
 
         var templateFileName = tl.getPathInput('templatefile', true);
 
@@ -45,28 +44,28 @@ async function run() {
         var data = fs.readFileSync(templateFileName);
         var templateText = data.toString();
 
-        templateText = ReplaceBuildTokens(templateText, buildId);
+        templateText = replaceBuildTokens(templateText, buildId);
 
-        ParseQueryResults(firstQueryId, projectId, vstsWit, "|BUILD_QUERY_ONE|", templateText, buildId, updateFirstQuery).then((value: string) => {
+        parseQueryResults(firstQueryId, projectId, vstsWit, 'ONE', templateText, buildId, updateFirstQuery).then((value: string) => {
             templateText = value;
 
-            ParseQueryResults(secondQueryId, projectId, vstsWit, "|BUILD_QUERY_TWO|", templateText, buildId, updateSecondQuery).then((value: string) => {
+            parseQueryResults(secondQueryId, projectId, vstsWit, 'TWO', templateText, buildId, updateSecondQuery).then((value: string) => {
                 templateText = value;
 
-                ParseQueryResults(thirdQueryId, projectId, vstsWit, "|BUILD_QUERY_THREE|", templateText, buildId, updateThirdQuery).then((value: string) => {
+                parseQueryResults(thirdQueryId, projectId, vstsWit, 'THREE', templateText, buildId, updateThirdQuery).then((value: string) => {
                     templateText = value;
 
-                    console.log("Template: " + templateText);
+                    console.log('Template: ' + templateText);
 
                     fs.writeFileSync(outputFileName, templateText);
                 }).catch((reason: any) => {
-                    console.log("Error with third query: " + reason);
+                    console.log('Error with third query: ' + reason);
                 });
             }).catch((reason: any) => {
-                console.log("Error with second query: " + reason);
+                console.log('Error with second query: ' + reason);
             });
         }).catch((reason: any) => {
-            console.log("Error with first query: " + reason);
+            console.log('Error with first query: ' + reason);
         });
     }
     catch (err) {
@@ -75,101 +74,96 @@ async function run() {
     }
 }
 
-function ReplaceBuildTokens(templateText : string, buildId : string) : string {
-    templateText = ReplaceBuildId(templateText, buildId);
-    templateText = ReplaceBuildNumber(templateText);
-    templateText = ReplaceSourceVersion(templateText);
-    templateText = ReplaceSourceBranchName(templateText);
-    templateText = ReplaceRepositoryUri(templateText);
-    templateText = ReplaceBuildUri(templateText);
-    templateText = ReplaceUTCDate(templateText);
+function replaceBuildTokens(templateText : string, buildId : string) : string {
+    templateText = replaceBuildId(templateText, buildId);
+    templateText = replaceBuildNumber(templateText);
+    templateText = replaceSourceVersion(templateText);
+    templateText = replaceSourceBranchName(templateText);
+    templateText = replaceRepositoryUri(templateText);
+    templateText = replaceBuildUri(templateText);
+    templateText = replaceUTCDate(templateText);
     return templateText;
 }
 
-function ReplaceBuildId(templateText : string, buildId : string) : string {
-    templateText = templateText.replace("|BUILD_BUILDID|", buildId);
+function replaceBuildId(templateText : string, buildId : string) : string {
+    templateText = templateText.replace('|BUILD_BUILDID|', buildId);
     return templateText;
 }
 
-function ReplaceBuildNumber(templateText : string) : string {
+function replaceBuildNumber(templateText : string) : string {
     var buildVariable = process.env.BUILD_BUILDNUMBER;
-    templateText = templateText.replace("|BUILD_BUILDNUMBER|", buildVariable);
+    templateText = templateText.replace('|BUILD_BUILDNUMBER|', buildVariable);
     return templateText;
 }
 
-function ReplaceSourceVersion(templateText : string) : string {
+function replaceSourceVersion(templateText : string) : string {
     var buildVariable = process.env.BUILD_SOURCEVERSION;
-    templateText = templateText.replace("|BUILD_SOURCEVERSION|", buildVariable);
+    templateText = templateText.replace('|BUILD_SOURCEVERSION|', buildVariable);
     return templateText;
 }
 
-function ReplaceSourceBranchName(templateText : string) : string {
+function replaceSourceBranchName(templateText : string) : string {
     var buildVariable = process.env.BUILD_SOURCEBRANCHNAME;
-    templateText = templateText.replace("|BUILD_SOURCEBRANCHNAME|", buildVariable);
+    templateText = templateText.replace('|BUILD_SOURCEBRANCHNAME|', buildVariable);
     return templateText;
 }
 
-function ReplaceRepositoryUri(templateText : string) : string {
+function replaceRepositoryUri(templateText : string) : string {
     var buildVariable = process.env.BUILD_REPOSITORY_URI;
-    templateText = templateText.replace("|BUILD_REPOSITORY_URI|", buildVariable);
+    templateText = templateText.replace('|BUILD_REPOSITORY_URI|', buildVariable);
     return templateText;
 }
 
-function ReplaceBuildUri(templateText : string) : string {
+function replaceBuildUri(templateText : string) : string {
     var buildVariable = process.env.BUILD_BUILDURI;
-    templateText = templateText.replace("|BUILD_BUILDURI|", buildVariable);
+    templateText = templateText.replace('|BUILD_BUILDURI|', buildVariable);
     return templateText;
 }
 
-function ReplaceUTCDate(templateText : string) : string {
+function replaceUTCDate(templateText : string) : string {
     var buildVariable = (new Date()).toUTCString();;
-    templateText = templateText.replace("|CURRENT_DATE_UTC|", buildVariable);
+    templateText = templateText.replace('|CURRENT_DATE_UTC|', buildVariable);
     return templateText;
 }
 
-function ParseQueryResults(queryId : string, projectId : string, vstsWit : wit.IWorkItemTrackingApi, replacetoken : string, templateText : string, buildId : string, updateQuery : boolean) : Promise<string> {
+function parseQueryResults(queryId : string, projectId : string, vstsWit : wit.IWorkItemTrackingApi, replacetoken : string, templateText : string, buildId : string, updateQuery : boolean) : Promise<string> {
     let queryPromise = new Promise<string>((resolve, reject) => {
        
         if (queryId == null || queryId == '') {
             resolve(templateText);
-        }
-        else
-        {
+        } else {
             console.log(queryId);
 
-            var replacementText : string = "";
             var context : any = {};
             context.projectId = projectId;
             var results = vstsWit.queryById(queryId, context).then((results : WorkItemTrackingInterfaces.WorkItemQueryResult) => {
                 console.log('calling query');
-                console.log("result: " + results);
-
-                replacementText = WriteHeader(replacementText);
+                console.log('result: ' + results);
 
                 var ids : number[];
                 var fields : string[] = new Array(2);
-                fields[0]="System.WorkItemType";
-                fields[1]="System.Title";
+                fields[0]='System.WorkItemType';
+                fields[1]='System.Title';
 
-                console.log("Result type: " + results.queryType);
+                console.log('Result type: ' + results.queryType);
 
                 if (results.queryType == WorkItemTrackingInterfaces.QueryType.Tree || results.queryType == WorkItemTrackingInterfaces.QueryType.OneHop) {
-                    console.log("Work Item Results Count: " + results.workItemRelations.length);
+                    console.log('Work Item Results Count: ' + results.workItemRelations.length);
                     if (results.workItemRelations.length > 0) {
-                        var sortedList = GetRelationsSortedList(results.workItemRelations);
-                        console.log("Sorted List Length: " + sortedList.length);
+                        var sortedList = getRelationsSortedList(results.workItemRelations);
+                        console.log('Sorted List Length: ' + sortedList.length);
                         ids = new Array(sortedList.length);
                         var i : number = 0;
                         sortedList.forEach(element => {
                             ids[i] = element.target.id;
                             i++;
                         });
-                        console.log("Done creating ids: " + ids[0]);
+                        console.log('Done creating ids: ' + ids[0]);
                     } else {
                         ids = null;
                     }
                 } else {
-                    console.log("Work Items Count: " + results.workItems.length);
+                    console.log('Work Items Count: ' + results.workItems.length);
                     if (results.workItems.length > 0) {
                         ids = new Array(results.workItems.length);
                         var i : number = 0;
@@ -182,31 +176,31 @@ function ParseQueryResults(queryId : string, projectId : string, vstsWit : wit.I
                     }
                 }
 
-                if (ids != null) {
-                    console.log("Ready to get individual items, ids found in query");
-                    WriteQueryResults(ids, fields, vstsWit, replacementText, buildId, updateQuery).then((returnedText : string) => {
-                        replacementText = returnedText;
-                        replacementText = WriteFooter(replacementText);
+                var lineTemplate = getReplacementLineTemplate(templateText, replacetoken);
+                console.log('Line template: ' + lineTemplate);
 
-                        templateText = templateText.replace(replacetoken, replacementText);
+                if (ids != null) {
+                    console.log('Ready to get individual items, ids found in query');
+                    writeQueryResults(ids, fields, vstsWit, lineTemplate, replacetoken, buildId, updateQuery).then((returnedText : string) => {
+                        console.log('Returned text: ' + returnedText);
+                        templateText = templateText.replace(lineTemplate, returnedText);
                         resolve(templateText);
                     });
                 } else {
-                    replacementText = WriteFooter(replacementText);
 
-                    templateText = templateText.replace(replacetoken, replacementText);
+                    templateText = templateText.replace(lineTemplate, "");
                     resolve(templateText);
                 }
             }).catch((reason : any) => {
                 console.log(reason);
-                reject("Task failed: " + reason);
+                reject('Task failed: ' + reason);
             });
         }
     });
     return queryPromise;
 }
 
-function GetRelationsSortedList(targetList : WorkItemTrackingInterfaces.WorkItemLink[]) : WorkItemTrackingInterfaces.WorkItemLink[] {
+function getRelationsSortedList(targetList : WorkItemTrackingInterfaces.WorkItemLink[]) : WorkItemTrackingInterfaces.WorkItemLink[] {
     var returnList : WorkItemTrackingInterfaces.WorkItemLink[] = new Array(targetList.length);
     var position : number = 0;
 
@@ -234,7 +228,7 @@ function AddChildrenToElement(returnList : WorkItemTrackingInterfaces.WorkItemLi
     return returnPosition;
 }
 
-function WriteQueryResults(ids : number[], fields : string[], vstsWit : wit.IWorkItemTrackingApi, replacementText : string, buildId : string, updateQuery : boolean) : Promise<string> {
+function writeQueryResults(ids : number[], fields : string[], vstsWit : wit.IWorkItemTrackingApi, lineTemplate : string, replacetoken : string, buildId : string, updateQuery : boolean) : Promise<string> {
     let resultPromise = new Promise<string>((resolve, reject) => {
         vstsWit.getWorkItems(ids, fields).then((returnItems : WorkItemTrackingInterfaces.WorkItem[]) => {
             
@@ -245,37 +239,76 @@ function WriteQueryResults(ids : number[], fields : string[], vstsWit : wit.IWor
                 position ++;
             });
 
-            sortedItems.forEach(element => {
-                var workItemType = element.fields['System.WorkItemType'];
-                replacementText = replacementText.concat("<tr><td>", element.id.toString(), "</td><td>", element.fields['System.Title'], "<td><td>", workItemType, "</td></tr>");
+            var replacementText : string = "";
+            lineTemplate = stripBeginEndtemplateTags(lineTemplate, replacetoken);
 
-                if (updateQuery && (workItemType == "Bug" || workItemType == "Task")) {
+            sortedItems.forEach(element => {
+                replacementText = writeLine(replacementText, replacetoken, lineTemplate, element);
+
+                var workItemType : string = element.fields['System.WorkItemType'];
+                if (updateQuery && (workItemType == 'Bug' || workItemType == 'Task')) {
                 // Fire and forget these updates
                     var patch : any = {};
                     patch = JSON.parse('[{"op": "add","path": "/fields/Microsoft.VSTS.Build.IntegrationBuild", "value": "' + buildId + '"}]');
                     vstsWit.updateWorkItem(null, patch, element.id).then((value : WorkItemTrackingInterfaces.WorkItem) => {
-                        console.log("Work item: " + element.id + " updated");
+                        console.log('Work item: ' + element.id + ' updated');
                     }).catch((reason : any) => {
-                        console.log("Error updating work item: " + reason);
+                        console.log('Error updating work item: ' + reason);
                     });
                 }
             });
             resolve(replacementText);
         }).catch((reason : any) => {
-            console.log("Error retrieving individual query items: " + reason);
+            console.log('Error retrieving individual query items: ' + reason);
         });
     });
     return resultPromise;
 }
 
-function WriteHeader(replacementText : string) : string {
-    replacementText = replacementText.concat("<table><tr><th>Id</th><th>Type</th><th>Name</th></tr>");
+function writeLine(replacementText : string, replacetoken : string, lineTemplate: string, element : WorkItemTrackingInterfaces.WorkItem) : string {
+    var idToken : string = '|DETAIL_ID_' + replacetoken + '|';
+    var typeToken : string = '|DETAIL_TYPE_' + replacetoken + '|';
+    var nameToken : string = '|DETAIL_NAME_' + replacetoken + '|';
+
+    lineTemplate = lineTemplate.replace(idToken, element.id.toString());
+    lineTemplate = lineTemplate.replace(typeToken, element.fields['System.WorkItemType']);
+    lineTemplate = lineTemplate.replace(nameToken, element.fields['System.Title']);
+
+    replacementText = replacementText.concat(lineTemplate);
     return replacementText;
 }
 
-function WriteFooter(replacementText : string) : string {
-    replacementText = replacementText.concat("</table>");
-    return replacementText;
+function getReplacementLineTemplate(templateText : string, replacetoken: string) : string {
+    var lineStartToken : string = getLineStartTag(replacetoken);
+    var lineEndToken : string = getLineEndTag(replacetoken);
+
+    var positionStart : number = templateText.indexOf(lineStartToken);
+    var positionEnd : number = templateText.indexOf(lineEndToken, positionStart);
+
+    if (positionStart >= 0 && positionEnd < 0) {
+        throw new Error('Start token ' + lineStartToken + ' found with no end token after it.');
+    }
+
+    var length : number = (positionEnd + lineEndToken.length) - positionStart;
+
+    return templateText.substr(positionStart, length);
+}
+
+function stripBeginEndtemplateTags(templateText : string, replacetoken: string) : string {
+    var lineStartToken : string = getLineStartTag(replacetoken);
+    var lineEndToken : string = getLineEndTag(replacetoken);
+    var returnText : string = "";
+
+    returnText = templateText.replace(lineStartToken, "");
+    return returnText.replace(lineEndToken, "");
+}
+
+function getLineStartTag(replacetoken: string) : string {
+    return '|START_DETAIL_LINE_' + replacetoken + '|';
+}
+
+function getLineEndTag(replacetoken: string) : string {
+    return '|END_DETAIL_LINE_' + replacetoken + '|';
 }
 
 run();

@@ -1,5 +1,3 @@
-![alt tag](/icon.png?raw=true "Release Notes")
-
 # Release Notes Task for VSTS
 Task for VSTS to create release notes base on VSTS queries.
 
@@ -40,9 +38,9 @@ A template is simply a text file and can be in any number of formats. This task 
 ## Third query relpacement tokens
 - |START_DETAIL_LINE_THREE| - The start of a detail line for the third query. Line will be repeated for each result.
 - |END_DETAIL_LINE_THREE| - The end of a detail line for the third query, must appear after the |START_DETAIL_LINE_THREE| tag.
-- |DETAIL_ID_THREE| - the VSTS id of an element retuned from the third query. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
-- |DETAIL_TYPE_THREE| - the VSTS type of an element retuned from the third query such as bug, task or user story. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
-- |DETAIL_NAME_THREE| - the VSTS name of an element retuned from the third query. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
+- |DETAIL_ID_THREE| - The VSTS id of an element retuned from the third query. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
+- |DETAIL_TYPE_THREE| - The VSTS type of an element retuned from the third query such as bug, task or user story. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
+- |DETAIL_NAME_THREE| - The VSTS name of an element retuned from the third query. Must appear between the |START_DETAIL_LINE_THREE| and |END_DETAIL_LINE_THREE| tags to be effective.
 
 Samples of build templates can be found in the templates directory.
 
@@ -50,7 +48,7 @@ Samples of build templates can be found in the templates directory.
 
 As part of the build add this task which should look like this:
 
-![alt tag](/docs/TaskSetup.png?raw=true "Setup")
+![alt tag](https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/docs/TaskSetup.png?raw=true "Setup")
 
 ## Output file
 The is the path and file name in the build to output the release notes file. You can then use this location to do something with the release notes, like add them to a HockeyApp upload. Here is an example:
@@ -72,19 +70,19 @@ The following shows the settings for setting up security on the query:
 
 Go to the query and select the security option:
 
-![alt tag](/docs/EnterSecurity.png?raw=true "Security")
+![alt tag](https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/docs/EnterSecurity.png?raw=true "Security")
 
 Add a user to the security configuration:
 
-![alt tag](/docs/AddUser.png?raw=true "Add User")
+![alt tag](https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/docs/AddUser.png?raw=true "Add User")
 
 Select to add the Project Collection Build Services user:
 
-![alt tag](/docs/SelectUser.png?raw=true "Select User")
+![alt tag](https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/docs/SelectUser.png?raw=true "Select User")
 
 Make sure read is set to allow for the Project Collection Build Services and the Save Changes button is pressed:
 
-![alt tag](/docs/UserSettings.png?raw=true "User Security Settings")
+![alt tag](https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/docs/UserSettings.png?raw=true "User Security Settings")
 
 ### Find out the guid of the query
 You can find the quid of the query by opening a browser that is logged on to your VSTS account and navigate to a URL in the following format:

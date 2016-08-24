@@ -4,8 +4,16 @@
 </br>
 ## Build Date: |CURRENT_DATE_UTC|
 </br>
+## Build Location: |BUILD_BUILDURI|
+</br>
 ### Work items associated with this release
-|BUILD_QUERY_ONE|
+<table>
+<tr><th>Id</th><th>Type</th><th>Name</th></tr>
+|START_DETAIL_LINE_TWO|<tr><td>|DETAIL_ID_TWO|</td><td>|DETAIL_TYPE_TWO|</td><td>|DETAIL_NAME_TWO|</td></tr>|END_DETAIL_LINE_TWO|
+</table>
 </br>
 ### Bug Fixes associated with this release
-|BUILD_QUERY_TWO|
+<table>
+<tr><th>Id</th><th>Type</th><th>Name</th></tr>
+|START_DETAIL_LINE_ONE|<tr><td>|DETAIL_ID_ONE|</td><td>|DETAIL_TYPE_ONE|</td><td>|DETAIL_NAME_ONE|</td></tr>|END_DETAIL_LINE_ONE|
+</table>

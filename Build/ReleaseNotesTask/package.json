@@ -1,0 +1,19 @@
+{
+  "name": "buildreleasenotes",
+  "version": "1.0.0",
+  "description": "Generates release notes for a build.",
+  "main": "releasenotes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "release",
+    "notes"
+  ],
+  "author": "Kevin E. Ford",
+  "license": "ISC",
+  "dependencies": {
+    "vso-node-api": "^4.0.0",
+    "vsts-task-lib": "^0.9.7"
+  }
+}

@@ -1,0 +1,68 @@
+{
+    "manifestVersion": 1,
+    "id": "buildreleasenotes",
+    "version": "1.0.0",
+    "name": "Generates release notes for a build.",
+    "publisher": "Magenic",
+    "description": "This task is great for continuous deployment processes when you want to automatically generate release notes from VSTS. It is written using Node.Js.",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "icons": {
+        "default": "images/logo.png"
+    },
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "release notes",
+        "release",
+        "notes",
+        "generate"
+    ],
+    "screenshots": [
+        {
+            "path": "images/screenshot.png"
+        }
+    ],
+    "content": {
+        "details": {
+            "path": "overview.md"
+        }
+    },
+    "links": {
+        "getstarted": {
+            "uri": "https://github.com/Magenic/ReleaseNotesVSTSTask"
+        },
+        "license": {
+            "uri": "https://github.com/Magenic/ReleaseNotesVSTSTask/blob/master/LICENSE"
+        },
+        "support": {
+            "uri": "https://github.com/Magenic/ReleaseNotesVSTSTask/issues"
+        }
+     
+    },
+    "branding": {
+        "color": "rgb(120, 190, 67)",
+        "theme": "light"
+    },
+    "files": [
+        {
+            "path": "ReleaseNotesTask"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "buildreleasenotes",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ReleaseNotesTask"
+            }
+        }
+    ]
+}
