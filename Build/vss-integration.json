@@ -1,10 +1,11 @@
 {
     "manifestVersion": 1,
     "id": "buildreleasenotes",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "name": "Generates release notes for a build.",
     "publisher": "Magenic",
     "description": "This task is great for continuous deployment processes when you want to automatically generate release notes from VSTS. It is written using Node.Js.",
+    "public": true,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"

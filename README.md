@@ -159,3 +159,5 @@ Notice the results will all run together unless you include something like a mar
 
 # Other relevant information
 The "Integrated in build" fields of bugs and tasks can be updated without outputting results to the release notes file. To do this simply add a query for everything you want to update to one of the query slots, select Add build number to bugs and tasks and then do not include the query's line token information to the release notes template file.
+
+The working directory on Windows build servers is set to the value of the BUILD_REPOSITORY_LOCALPATH environment variable. For servers such as Macs where this variable is not defined the working directory is left unchnaged from the default.

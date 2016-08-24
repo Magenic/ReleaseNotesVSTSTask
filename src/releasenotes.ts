@@ -27,6 +27,12 @@ async function run() {
 
         console.log('connection established');
 
+        var buildRepository = process.env.BUILD_REPOSITORY_LOCALPATH;
+        if (typeof buildRepository != 'undefined' && buildRepository) {
+            console.log('New Working Directory: ' + buildRepository);
+            tl.cd(buildRepository);
+        }
+
         let vstsWit: wit.IWorkItemTrackingApi = connection.getWorkItemTrackingApi();
         console.log('work item interface created.');
 
