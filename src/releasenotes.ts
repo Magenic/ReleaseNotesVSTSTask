@@ -21,9 +21,9 @@ async function run() {
         var vssEndPoint = tl.getEndpointAuthorization('SystemVssConnection', true);
         var token = vssEndPoint.parameters['AccessToken'];
 
-        let authHandler = vsts.getPersonalAccessTokenHandler(token); 
-        
-        var connection = new vsts.WebApi(uri, authHandler); 
+        let authHandler = vsts.getPersonalAccessTokenHandler(token);
+
+        var connection = new vsts.WebApi(uri, authHandler);
 
         console.log('connection established');
 
@@ -134,7 +134,7 @@ function replaceUTCDate(templateText : string) : string {
 
 function parseQueryResults(queryId : string, projectId : string, vstsWit : wit.IWorkItemTrackingApi, replacetoken : string, templateText : string, buildId : string, updateQuery : boolean) : Promise<string> {
     let queryPromise = new Promise<string>((resolve, reject) => {
-       
+
         if (queryId == null || queryId == '') {
             resolve(templateText);
         } else {
@@ -236,37 +236,57 @@ function AddChildrenToElement(returnList : WorkItemTrackingInterfaces.WorkItemLi
 
 function writeQueryResults(ids : number[], fields : string[], vstsWit : wit.IWorkItemTrackingApi, lineTemplate : string, replacetoken : string, buildId : string, updateQuery : boolean) : Promise<string> {
     let resultPromise = new Promise<string>((resolve, reject) => {
-        vstsWit.getWorkItems(ids, fields).then((returnItems : WorkItemTrackingInterfaces.WorkItem[]) => {
-            
-            var sortedItems : WorkItemTrackingInterfaces.WorkItem[] = new Array(returnItems.length);
-            var position: number = 0;
-            ids.forEach(element => {
-                sortedItems[position] = returnItems.find(function(x){return x.id == element;});
-                position ++;
+        var idsSubset : number[];
+        var subArrayCount : number = 0;
+
+        for (var currentPosition : number = 0; currentPosition < ids.length; currentPosition++) {
+          if (subArrayCount == 0) {
+            if (ids.length - currentPosition >= 50) {
+              idsSubset = new Array(50);
+            } else {
+              idsSubset = new Array(ids.length - currentPosition)
+            }
+          }
+
+          idsSubset[subArrayCount] = ids[currentPosition];
+
+          if (subArrayCount == idsSubset.length - 1) {
+            vstsWit.getWorkItems(idsSubset, fields).then((returnItems : WorkItemTrackingInterfaces.WorkItem[]) => {
+
+                var sortedItems : WorkItemTrackingInterfaces.WorkItem[] = new Array(returnItems.length);
+                var position: number = 0;
+                ids.forEach(element => {
+                    sortedItems[position] = returnItems.find(function(x){return x.id == element;});
+                    position ++;
+                });
+
+                var replacementText : string = "";
+                lineTemplate = stripBeginEndtemplateTags(lineTemplate, replacetoken);
+
+                sortedItems.forEach(element => {
+                    replacementText = writeLine(replacementText, replacetoken, lineTemplate, element);
+
+                    var workItemType : string = element.fields['System.WorkItemType'];
+                    if (updateQuery && (workItemType == 'Bug' || workItemType == 'Task')) {
+                    // Fire and forget these updates
+                        var patch : any = {};
+                        patch = JSON.parse('[{"op": "add","path": "/fields/Microsoft.VSTS.Build.IntegrationBuild", "value": "' + buildId + '"}]');
+                        vstsWit.updateWorkItem(null, patch, element.id).then((value : WorkItemTrackingInterfaces.WorkItem) => {
+                            console.log('Work item: ' + element.id + ' updated');
+                        }).catch((reason : any) => {
+                            console.log('Error updating work item: ' + reason);
+                        });
+                    }
+                });
+                resolve(replacementText);
+            }).catch((reason : any) => {
+                console.log('Error retrieving individual query items: ' + reason);
             });
-
-            var replacementText : string = "";
-            lineTemplate = stripBeginEndtemplateTags(lineTemplate, replacetoken);
-
-            sortedItems.forEach(element => {
-                replacementText = writeLine(replacementText, replacetoken, lineTemplate, element);
-
-                var workItemType : string = element.fields['System.WorkItemType'];
-                if (updateQuery && (workItemType == 'Bug' || workItemType == 'Task')) {
-                // Fire and forget these updates
-                    var patch : any = {};
-                    patch = JSON.parse('[{"op": "add","path": "/fields/Microsoft.VSTS.Build.IntegrationBuild", "value": "' + buildId + '"}]');
-                    vstsWit.updateWorkItem(null, patch, element.id).then((value : WorkItemTrackingInterfaces.WorkItem) => {
-                        console.log('Work item: ' + element.id + ' updated');
-                    }).catch((reason : any) => {
-                        console.log('Error updating work item: ' + reason);
-                    });
-                }
-            });
-            resolve(replacementText);
-        }).catch((reason : any) => {
-            console.log('Error retrieving individual query items: ' + reason);
-        });
+            subArrayCount = 0;
+          } else {
+              subArrayCount ++;
+          }
+        }
     });
     return resultPromise;
 }
