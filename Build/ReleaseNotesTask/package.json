@@ -1,6 +1,6 @@
 {
   "name": "buildreleasenotes",
-  "version": "1.0.7",
+  "version": "1.0.11",
   "description": "Generates release notes for a build.",
   "main": "releasenotes.js",
   "scripts": {

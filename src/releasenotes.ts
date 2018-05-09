@@ -238,6 +238,7 @@ function writeQueryResults(ids : number[], fields : string[], vstsWit : wit.IWor
     let resultPromise = new Promise<string>((resolve, reject) => {
         var idsSubset : number[];
         var subArrayCount : number = 0;
+        var promises = [];
 
         for (var currentPosition : number = 0; currentPosition < ids.length; currentPosition++) {
           if (subArrayCount == 0) {
@@ -251,42 +252,65 @@ function writeQueryResults(ids : number[], fields : string[], vstsWit : wit.IWor
           idsSubset[subArrayCount] = ids[currentPosition];
 
           if (subArrayCount == idsSubset.length - 1) {
-            vstsWit.getWorkItems(idsSubset, fields).then((returnItems : WorkItemTrackingInterfaces.WorkItem[]) => {
-
-                var sortedItems : WorkItemTrackingInterfaces.WorkItem[] = new Array(returnItems.length);
-                var position: number = 0;
-                ids.forEach(element => {
-                    sortedItems[position] = returnItems.find(function(x){return x.id == element;});
-                    position ++;
-                });
-
-                var replacementText : string = "";
-                lineTemplate = stripBeginEndtemplateTags(lineTemplate, replacetoken);
-
-                sortedItems.forEach(element => {
-                    replacementText = writeLine(replacementText, replacetoken, lineTemplate, element);
-
-                    var workItemType : string = element.fields['System.WorkItemType'];
-                    if (updateQuery && (workItemType == 'Bug' || workItemType == 'Task')) {
-                    // Fire and forget these updates
-                        var patch : any = {};
-                        patch = JSON.parse('[{"op": "add","path": "/fields/Microsoft.VSTS.Build.IntegrationBuild", "value": "' + buildId + '"}]');
-                        vstsWit.updateWorkItem(null, patch, element.id).then((value : WorkItemTrackingInterfaces.WorkItem) => {
-                            console.log('Work item: ' + element.id + ' updated');
-                        }).catch((reason : any) => {
-                            console.log('Error updating work item: ' + reason);
-                        });
-                    }
-                });
-                resolve(replacementText);
-            }).catch((reason : any) => {
-                console.log('Error retrieving individual query items: ' + reason);
-            });
+            promises.push(getSubQuery(idsSubset, fields, vstsWit, lineTemplate, replacetoken, buildId, updateQuery));
             subArrayCount = 0;
           } else {
               subArrayCount ++;
           }
         }
+
+        Promise.all(promises)
+        .then((results) => {
+          console.log("All query fetches done", results);
+          var replacementText : string = "";
+          results.forEach(element => {
+            replacementText += element;
+          });
+          resolve(replacementText);
+        })
+        .catch((reason: any) => {
+            console.log('Error waiting for all queiry items to return: ' + reason);
+        });
+    });
+    return resultPromise;
+}
+
+function getSubQuery(idsSubset : number[], fields : string[], vstsWit : wit.IWorkItemTrackingApi, lineTemplate : string, replacetoken : string, buildId : string, updateQuery : boolean) : Promise<string> {
+    let resultPromise = new Promise<string>((resolve, reject) => {
+        vstsWit.getWorkItems(idsSubset, fields).then((returnItems : WorkItemTrackingInterfaces.WorkItem[]) => {
+
+            console.log('Items Found: ' + returnItems.length);
+            var sortedItems : WorkItemTrackingInterfaces.WorkItem[] = new Array(returnItems.length);
+            var position: number = 0;
+            idsSubset.forEach(element => {
+                sortedItems[position] = returnItems.find(function(x){return x.id == element;});
+                position ++;
+            });
+
+            console.log('Completed finding sorted items, count: ' + sortedItems.length);
+            var replacementText : string = "";
+            lineTemplate = stripBeginEndtemplateTags(lineTemplate, replacetoken);
+
+            sortedItems.forEach(element => {
+                replacementText = writeLine(replacementText, replacetoken, lineTemplate, element);
+
+                var workItemType : string = element.fields['System.WorkItemType'];
+                if (updateQuery && (workItemType == 'Bug' || workItemType == 'Task')) {
+                // Fire and forget these updates
+                    var patch : any = {};
+                    patch = JSON.parse('[{"op": "add","path": "/fields/Microsoft.VSTS.Build.IntegrationBuild", "value": "' + buildId + '"}]');
+                    vstsWit.updateWorkItem(null, patch, element.id).then((value : WorkItemTrackingInterfaces.WorkItem) => {
+                        console.log('Work item: ' + element.id + ' updated');
+                    }).catch((reason : any) => {
+                        console.log('Error updating work item: ' + reason);
+                    });
+                }
+            });
+            resolve(replacementText);
+        }).catch((reason : any) => {
+            console.log('Error retrieving individual query items: ' + reason);
+            reject(reason);
+        });
     });
     return resultPromise;
 }
@@ -326,6 +350,7 @@ function stripBeginEndtemplateTags(templateText : string, replacetoken: string) 
     var returnText : string = "";
 
     returnText = templateText.replace(lineStartToken, "");
+    console.log('Line Template Text: ' + returnText.replace(lineEndToken, ""));
     return returnText.replace(lineEndToken, "");
 }
 

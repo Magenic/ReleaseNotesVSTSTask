@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "buildreleasenotes",
-    "version": "1.0.7",
+    "version": "1.0.11",
     "name": "Generate Build Release Notes",
     "publisher": "Magenic",
     "description": "This task is great for continuous deployment processes when you want to automatically generate release notes from VSTS. It is written using Node.Js.",
@@ -43,7 +43,6 @@
         "support": {
             "uri": "https://github.com/Magenic/ReleaseNotesVSTSTask/issues"
         }
-
     },
     "branding": {
         "color": "rgb(120, 190, 67)",
